@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block table %}
+{% block content %}
     <table id="uplinks" width="100%" class="display nowrap cell-border">
         <thead>
             <tr>
@@ -21,4 +21,11 @@
 {% block map %}
     <div id="map">
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
+    async defer></script>
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}

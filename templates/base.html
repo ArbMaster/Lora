@@ -16,7 +16,7 @@
     <div class="container">
         <div class="container-fluid">
             <div class="content">
-                {% block table %}
+                {% block content %}
                 {% endblock %}
             </div>
         </div>
@@ -31,11 +31,7 @@
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
-    async defer></script>
-    
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-
+    {% block scripts %}
+    {% endblock %}
 </body>
 </html>

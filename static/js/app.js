@@ -2,6 +2,7 @@
 
 var map;
 var marker = false;
+var table;
 
 function initMap() {
     var elem = document.getElementById('map');
@@ -31,7 +32,7 @@ function afterTableDraw(settings){
 }
 
 function createTable(){
-    $('#uplinks').DataTable({
+    table = $('#uplinks').DataTable({
         "processing": true,
         "serverSide": true,
         "ajax":{
@@ -67,7 +68,6 @@ function createTable(){
             {"className": "dt-center", "targets": "_all"}
         ],
         searching: false
-        
     });
 }
 

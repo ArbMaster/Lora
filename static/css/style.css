@@ -1,3 +1,16 @@
 #map {
     height: 425px;
 }
+
+#device-table caption {
+  caption-side: top;
+  text-align: center;
+}
+
+#device-table td, #device-table th {
+    text-align: center;
+}
+
+.flashes {
+    color: red;
+}
