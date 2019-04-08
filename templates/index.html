@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block table %}
+    <table id="uplinks" width="100%" class="display nowrap cell-border">
+        <thead>
+            <tr>
+                <th>DevEUI</th>
+                <th>Source</th>
+                <th>Time</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Uplinks</th>
+                <th>Downlinks</th>
+                <th>Temperature (°C)</th>
+                <th>Locate</th>
+            </tr>
+        </thead>
+    </table>
+{% endblock %}
+
+{% block map %}
+    <div id="map">
+    </div>
+{% endblock %}

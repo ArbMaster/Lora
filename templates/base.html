@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+</head>
+
+<body>
+    
+    <div class="container">
+        <div class="container-fluid">
+            <div class="content">
+                {% block table %}
+                {% endblock %}
+            </div>
+        </div>
+    
+    
+        <div id="map-modal">
+            {% block map %}
+            {% endblock %}
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{API_KEY}}&callback=initMap"
+    async defer></script>
+    
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
