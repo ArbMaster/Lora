@@ -26,7 +26,6 @@ from pprint import pprint as pp
 
 import db
 import lora
-        
 
 @app.before_request
 def before_request():
@@ -58,11 +57,12 @@ def admin():
         else:
             flash('This Device already exists!')
         return redirect(url_for('admin'))
-    
+
 @app.route('/api/table', methods=['POST'])
 def datatable():
     if not request.is_json:
         abort(400)
+        return
     received = request.json
     try:
         draw = received['draw']
@@ -70,6 +70,7 @@ def datatable():
         offset = received['start']
     except KeyError:
         abort(400)
+        return
     data = db.get_all_records(g.dbhandle.cursor(), offset, limit)
     recordCount = db.get_count(g.dbhandle.cursor())
     result = {

@@ -47,14 +47,7 @@ def get_all_records(cursor, offset, limit):
         })
     return result
 
-"""
-CREATE TABLE IF NOT EXISTS Profile (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    decoder TEXT NOT NULL
-);
-"""
-    
+
 def get_all_profiles(cursor):
     query = "SELECT id, name FROM profile"
     return cursor.execute(query).fetchall()
