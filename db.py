@@ -27,14 +27,16 @@ def get_count(cursor):
 def get_all_records(cursor, offset, limit):
     result = []
     q = """
-        SELECT deveui, payload, ts 
-        FROM Payload
+        SELECT d.deveui, p.payload, p.ts, p.decoder
+        FROM Payload p
+        INNER JOIN Device d ON p.deveui = d.deveui
+        INNER JOIN Profile p ON d.pid = p.pid
         ORDER BY ts DESC 
         LIMIT ? OFFSET ?
         """
     for row in cursor.execute(q, (limit, offset)):
-        deveui, data, ts = row
-        payload = Payload(data)
+        deveui, data, ts, decoder = row
+        payload = Payload(data, decoder)
         result.append({
             'DevEUI': deveui,
             'Source': payload.source,
@@ -63,7 +65,7 @@ def get_all_devices(cursor):
     
 def add_device(cursor, deveui, profile):
     query = """
-        INSERT INTO Device (deveui, profileID)
+        INSERT INTO Device (deveui, pid)
         VALUES(?, ?)
         """
     try:

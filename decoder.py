@@ -5,6 +5,7 @@ from collections import OrderedDict
 import json
 
 """
+Adeunis Decoder
 Example: 9e16411954000194897013130c0f
 FLAGS
 7 Presence of temperature information 0 or 1
@@ -19,9 +20,10 @@ FLAGS
 """
 
 class Payload:
-    def __init__(self, payload_string):
+    def __init__(self, payload_string, decoder):
         payload = bytes.fromhex(payload_string)
         self.flags, self.data = payload[0], payload_string[2:]
+        self._decoder = decoder
         self._decode()
         
     @property
@@ -33,7 +35,7 @@ class Payload:
         else:
             return 'Periodic'
     
-    def _decode(self):
+    def _decode_adeunis(self):
         #See: https://www.adeunis.com/wp-content/uploads/2017/08/FTD_sigfox_RC1_UG_FR_GB_V1.1.3.pdf
         index = 0
         if self.flags & (1 << 7):
@@ -64,14 +66,20 @@ class Payload:
         if self.flags & (1 << 3):
             self.uplink = int(self.data[index:index+2], 16)
             self.downlink = int(self.data[index+2:index+4], 16)
-
+    
+    def _decode(self):
+        if self._decoder == 'adeunis':
+            self._decode_adeunis()
+        else:
+            raise TypeError("Cannot decode payload of type '%s'!" % self._decoder)
+            
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
         data = sys.argv[1]
     else:
         data = sys.stdin.readline().strip()
-    p = Payload(data)
+    p = Payload(data, 'adeunis') #adeunis is done for now
     print(p.source)
     print(p.temperature)
     print(p.latitude)
