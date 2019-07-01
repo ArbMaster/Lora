@@ -25,7 +25,6 @@ from pprint import pprint as pp
 from datetime import datetime
 
 import db
-import lora
 
 @app.before_request
 def before_request():
