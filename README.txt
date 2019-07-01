@@ -3,5 +3,6 @@
 3. Add environment variables
     export MAPS_API_KEY=<key>
     export FLASK_APP=main.py
+    export SECRET_KEY=...
 4. Initialize DB: flask initdb
 5. Run application: flask run --host=0.0.0.0 --port=8888
