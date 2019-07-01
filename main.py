@@ -20,9 +20,9 @@ import settings
 app = Flask(__name__)
 app.secret_key = settings.SECRET_KEY
 app.config['SESSION_TYPE'] = 'filesystem'
-#session.init_app(app)
 
 from pprint import pprint as pp
+from datetime import datetime
 
 import db
 import lora
@@ -34,7 +34,21 @@ def before_request():
 @app.teardown_request
 def teardown_request(exception):
     g.dbhandle.close()        
-        
+
+@app.route('/lora/', methods=['POST'])
+def uplink():
+    if request.is_json:
+        data = request.json['DevEUI_uplink']
+        print(data)
+        cursor = g.dbhandle.cursor()
+        q = 'INSERT INTO Payload (deveui, payload, ts) VALUES (?, ?, ?)'
+        values = (data['DevEUI'], data['payload_hex'], datetime.now().timestamp())
+        cursor.execute(q, values)
+        g.dbhandle.commit()
+        return "", 200
+    else:
+        return "", 400
+    
 @app.route('/web/')
 def webindex():
     data = {
@@ -82,5 +96,4 @@ def datatable():
     return jsonify(result)
         
 if __name__ == '__main__':
-    
     app.run(host= '0.0.0.0', port=8888, debug=True)

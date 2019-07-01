@@ -14,7 +14,7 @@ def connect():
    
 @app.cli.command('initdb')
 def init():
-    with closing(connect_db()) as db:
+    with closing(connect()) as db:
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read().decode('utf-8'))
         db.commit()
@@ -51,7 +51,7 @@ def get_all_records(cursor, offset, limit):
 
 
 def get_all_profiles(cursor):
-    query = "SELECT id, name FROM profile"
+    query = "SELECT pid, name FROM profile"
     return cursor.execute(query).fetchall()
    
    
@@ -60,6 +60,7 @@ def get_all_devices(cursor):
         SELECT d.deveui, p.name
         FROM Device d 
         INNER JOIN Profile p
+        ON d.pid = p.pid
         """
     return cursor.execute(query).fetchall()
     

@@ -21,23 +21,30 @@ FLAGS
 
 class Payload:
     def __init__(self, payload_string, decoder):
-        payload = bytes.fromhex(payload_string)
-        self.flags, self.data = payload[0], payload_string[2:]
-        self._decoder = decoder
-        self._decode()
-        
-    @property
-    def source(self):
-        if self.flags & (1 << 6):
-            return 'Accelerometer'
-        elif self.flags & (1 << 5):
-            return 'Button'
-        else:
-            return 'Periodic'
+        self._raw_bytes = payload_string
+        if decoder == 'adeunis':
+            self._decode_adeunis()
+        elif decoder == 'watteco':
+            self._raw_bytes = '8e1516160eda'
+            self._decode_adeunis() #FIX ME! Create watteco decoder
+
+    def _decode_watteco(self):
+        return "" #TODO
     
     def _decode_adeunis(self):
         #See: https://www.adeunis.com/wp-content/uploads/2017/08/FTD_sigfox_RC1_UG_FR_GB_V1.1.3.pdf
+        payload = bytes.fromhex(self._raw_bytes)
+        self.flags, self.data = payload[0], self._raw_bytes[2:]
+        
+        if self.flags & (1 << 6):
+            self.source = 'Accelerometer'
+        elif self.flags & (1 << 5):
+            self.source = 'Button'
+        else:
+            self.source = 'Periodic'
+        
         index = 0
+        
         if self.flags & (1 << 7):
             self.temperature = int(self.data[:index+2], 16)
             index += 2
@@ -79,7 +86,7 @@ if __name__ == "__main__":
         data = sys.argv[1]
     else:
         data = sys.stdin.readline().strip()
-    p = Payload(data, 'adeunis') #adeunis is done for now
+    p = Payload(data, 'adeunis')
     print(p.source)
     print(p.temperature)
     print(p.latitude)
