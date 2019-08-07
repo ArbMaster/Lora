@@ -1,25 +1,10 @@
 'use strict';
 
-/*
-var map;
-var marker = false;
-*/
 var table;
-
-/*
-function initMap() {
-    var elem = document.getElementById('map');
-    map = new google.maps.Map(elem,{
-        center: {lat: 41.3275, lng: 19.8187},
-        zoom: 15
-    });
-}
-*/
 
 function afterTableDraw(settings){
     $(".locate").click(function(e){
         e.preventDefault();
-        console.log('map clicked!');
         var latitude  = $($(this).closest('tr').children()[3]).text();
         var longitude = $($(this).closest('tr').children()[4]).text();
         var data = {'latitude': latitude, 'longitude': longitude}
@@ -35,8 +20,6 @@ function afterTableDraw(settings){
                 $("#map-modal").dialog("open");
             },
             'error': function(jqXHR, textStatus, errorThrown){
-                console.log(errorThrown);
-                console.log(textStatus);
                 $("#map-modal").html("<p>Missing coordinates!</p>");
                 $("#map-modal").dialog("open");
             }
