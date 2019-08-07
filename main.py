@@ -15,6 +15,8 @@ from flask import (
     flash
 )
 
+import folium
+
 import settings
 
 app = Flask(__name__)
@@ -47,7 +49,11 @@ def uplink():
         return "", 200
     else:
         return "", 400
-    
+
+@app.route('/')
+def index():
+    return redirect(url_for('webindex'), code=302)
+   
 @app.route('/web/')
 def webindex():
     data = {
@@ -74,7 +80,7 @@ def admin():
 @app.route('/api/table', methods=['POST'])
 def datatable():
     if not request.is_json:
-        abort(400)
+        abort(400, "Data not in JSON format!")
         return
     received = request.json
     try:
@@ -82,7 +88,7 @@ def datatable():
         limit  = received['length']
         offset = received['start']
     except KeyError:
-        abort(400)
+        abort(400, description="Required parameters are missing!")
         return
     data = db.get_all_records(g.dbhandle.cursor(), offset, limit)
     recordCount = db.get_count(g.dbhandle.cursor())
@@ -93,6 +99,27 @@ def datatable():
         'data': data
     }
     return jsonify(result)
+
+@app.route('/map/', methods=['POST'])
+def render_map():
+    if not request.is_json:
+        abort(400)
+        return
+    try:
+        latitude  = request.json['latitude']
+        longitude = request.json['longitude']
+    except KeyError:
+        abort(400, description="Coordinates are missing!")
+        return
+    if latitude and longitude:
+        start_coords = (latitude, longitude)
+        folium_map = folium.Map(location=start_coords, zoom_start=14)
+        folium.Marker([latitude, longitude]).add_to(folium_map)
+        return folium_map._repr_html_()
+    else:
+        abort(400, description="Invalid coordinates!")
+        return
+    
         
 if __name__ == '__main__':
     app.run(host= '0.0.0.0', port=8888, debug=True)

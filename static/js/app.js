@@ -1,9 +1,12 @@
 'use strict';
 
+/*
 var map;
 var marker = false;
+*/
 var table;
 
+/*
 function initMap() {
     var elem = document.getElementById('map');
     map = new google.maps.Map(elem,{
@@ -11,22 +14,34 @@ function initMap() {
         zoom: 15
     });
 }
+*/
 
 function afterTableDraw(settings){
     $(".locate").click(function(e){
         e.preventDefault();
-        
+        console.log('map clicked!');
         var latitude  = $($(this).closest('tr').children()[3]).text();
         var longitude = $($(this).closest('tr').children()[4]).text();
+        var data = {'latitude': latitude, 'longitude': longitude}
+        $.ajax({
+            'url': '/map/',
+            'method': 'POST',
+            'accepts': 'text/html',
+            'contentType': 'application/json',
+            'dataType': 'html',
+            'data': JSON.stringify(data),
+            'success': function(html_data){
+                $("#map-modal").html(html_data);
+                $("#map-modal").dialog("open");
+            },
+            'error': function(jqXHR, textStatus, errorThrown){
+                console.log(errorThrown);
+                console.log(textStatus);
+                $("#map-modal").html("<p>Missing coordinates!</p>");
+                $("#map-modal").dialog("open");
+            }
+        });
         
-        if(!(latitude && longitude)){
-            return;
-        }                    
-        var loc = new google.maps.LatLng(latitude,longitude);
-        if(marker)
-            marker.setMap(null);
-        marker = new google.maps.Marker({position: loc, map: map});
-        $("#map-modal").dialog("open");
         
     });
 }
@@ -42,7 +57,7 @@ function createTable(){
             data: function (d) {
                 return JSON.stringify(d);
             },
-            error: function(){  // error handling
+            error: function(jqXHR, textStatus, errorThrown){  // error handling
                 console.log("AJAX Error!");
             }
         },
@@ -57,7 +72,6 @@ function createTable(){
             {data: 'Temperature'},
             {
                 data: null,
-                //defaultContent: '<img class="locate" height="32" width="32" src="../static/images/pin.png"/>',
                 defaultContent: '<a href="#" class="locate"><i class="fa fa-map-marker"></i></a>',
                 searchable: false,
                 orderable: false
@@ -73,17 +87,10 @@ function createTable(){
 
 $(document).ready(function(){
     createTable();
-    
     $("#map-modal").dialog({
         autoOpen:false,
         width: 600,
-        maxHeight : 600,
-        resizeStop: function(event, ui) {
-            google.maps.event.trigger(map, 'resize')
-        },
-        open: function(event, ui) {
-            google.maps.event.trigger(map, 'resize'); 
-        }
+        maxHeight : 600
     });
     
 });
