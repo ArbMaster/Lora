@@ -1,4 +1,4 @@
-1. Install flask: pip install flask
+1. Install flask: pip install flask folium
 2. Add environment variables
     export FLASK_APP=main.py
     export SECRET_KEY=...
