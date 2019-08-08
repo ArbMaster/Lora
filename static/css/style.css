@@ -7,6 +7,11 @@
     text-align: center;
 }
 
-.flashes {
-    color: red;
+.container-fluid {
+    padding: 15px;
 }
+
+/* nav {
+  background: #007bff;
+  background: linear-gradient(to right, #0062E6, #33AEFF);
+} */

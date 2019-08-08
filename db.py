@@ -7,8 +7,6 @@ from datetime import datetime
 from main import app
 from decoder import Payload
 
-import traceback
-
 SQLITE_TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def connect():
@@ -78,9 +76,28 @@ def add_device(cursor, deveui, profile):
     except sqlite3.IntegrityError:
         return False
     return True
-    
 
-        
+def get_user(cursor, username):
+    query = "SELECT id from User where username = ?"
+    try:
+        result = cursor.execute(query, (username, ))
+        user_id = result.fetchone()
+        return user_id
+    except:
+        return None
+
+def add_user(cursor, username, password, email):
+    query = "INSERT INTO User(username, password, email) VALUES(?, ?, ?)"
+    try:
+        cursor.execute(query, (username, password, email))
+        print('Added user with id: %d' % cursor.lastrowid)
+        return cursor.lastrowid
+    except sqlite3.IntegrityError:
+        return False
+    except:
+        print('DB add_user unknown error!')
+        return False
+
 def check_login(cursor, username, password):
     query = """
     SELECT id 
@@ -88,9 +105,8 @@ def check_login(cursor, username, password):
     WHERE username = ? AND password = ?
     """
     try:
-        cursor.execute(query, (username, password))
-        user_id = cursor.fetchone()[0]
-        return user_id
+        result = cursor.execute(query, (username, password))
+        return result.fetchone()[0]
     except IndexError:
         return False
     except:
@@ -101,22 +117,22 @@ def create_session(cursor, user_id, cookie):
     query = """INSERT INTO Session (cookie, uid) VALUES(?, ?)"""
     try:
         cursor.execute(query, (cookie, user_id))
-        print("Session created Cookie: %s, UserID = %d" %(cookie, user_id))
         return True 
     except:
-        print("Session not created!")
         return False
         
 def get_session(cursor, cookie):
-    query = "SELECT ts FROM Session where cookie = ?"
+    query = "SELECT uid, ts FROM Session where cookie = ?"
     try:
-        cursor.execute(query, (cookie, ))
-        ts = cursor.fetchone()[0]
+        result = cursor.execute(query, (cookie, ))
+        user_id, ts = result.fetchone()
         dt = datetime.strptime(ts, SQLITE_TIMESTAMP_FORMAT)
-        return dt.timestamp()
+        return user_id, dt.timestamp()
     except IndexError:
         return False
     except:
-        print("Get Session Error!")
-        traceback.print_exc()
         return False
+        
+def delete_session(cursor, user_id):
+    query = "DELETE FROM Session where uid = ?"
+    cursor.execute(query, (user_id, ))

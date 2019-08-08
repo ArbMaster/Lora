@@ -7,7 +7,9 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.1/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.1/css/v4-shims.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     
@@ -19,18 +21,42 @@
 <body>
     
     <div class="container">
+        {% block navbar %}
+        <!-- Taken from https://bootsnipp.com/snippets/nNX3a -->
+        <nav class="navbar navbar-icon-top navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Lora</a>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">
+                    <i class="fas fa-arrow-up"></i></i>Uplinks<span class="sr-only">(current)</span>
+                    </a>
+                </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                <i class="fas fa-map-marked-alt"></i>Map
+                </a>
+            </ul>
+           
+            <form class="form-inline my-2 my-lg-0" action="{{ url_for('logout') }}">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+            </form>
+            </div>
+        </nav>
+        {% endblock %}
+        
+    
         <div class="container-fluid">
             <div class="content">
                 {% block content %}
                 {% endblock %}
             </div>
         </div>
-    
-    
-        <div id="map-modal"></div>
-            {% block map %}
-            {% endblock %}
-        </div>
+        
+        {% block modal %}
+        {% endblock %}
+        
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
