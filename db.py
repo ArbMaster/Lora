@@ -7,6 +7,10 @@ from datetime import datetime
 from main import app
 from decoder import Payload
 
+import traceback
+
+SQLITE_TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
+
 def connect():
     handle = sqlite3.connect(settings.DATABASE)
     handle.cursor().execute('PRAGMA foreign_keys = ON')
@@ -74,3 +78,45 @@ def add_device(cursor, deveui, profile):
     except sqlite3.IntegrityError:
         return False
     return True
+    
+
+        
+def check_login(cursor, username, password):
+    query = """
+    SELECT id 
+    FROM User
+    WHERE username = ? AND password = ?
+    """
+    try:
+        cursor.execute(query, (username, password))
+        user_id = cursor.fetchone()[0]
+        return user_id
+    except IndexError:
+        return False
+    except:
+        print("DB check_login Error!")
+        return False
+    
+def create_session(cursor, user_id, cookie):
+    query = """INSERT INTO Session (cookie, uid) VALUES(?, ?)"""
+    try:
+        cursor.execute(query, (cookie, user_id))
+        print("Session created Cookie: %s, UserID = %d" %(cookie, user_id))
+        return True 
+    except:
+        print("Session not created!")
+        return False
+        
+def get_session(cursor, cookie):
+    query = "SELECT ts FROM Session where cookie = ?"
+    try:
+        cursor.execute(query, (cookie, ))
+        ts = cursor.fetchone()[0]
+        dt = datetime.strptime(ts, SQLITE_TIMESTAMP_FORMAT)
+        return dt.timestamp()
+    except IndexError:
+        return False
+    except:
+        print("Get Session Error!")
+        traceback.print_exc()
+        return False

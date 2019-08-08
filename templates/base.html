@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    
+    {% block styling %}
+    {% endblock %}
+    
 </head>
 
 <body>
@@ -23,7 +27,7 @@
         </div>
     
     
-        <div id="map-modal">
+        <div id="map-modal"></div>
             {% block map %}
             {% endblock %}
         </div>

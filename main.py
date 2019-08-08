@@ -15,18 +15,28 @@ from flask import (
     flash
 )
 
-import folium
+from functools import wraps
+from pprint import pprint as pp
+from datetime import datetime
 
+import folium
 import settings
 
 app = Flask(__name__)
 app.secret_key = settings.SECRET_KEY
 app.config['SESSION_TYPE'] = 'filesystem'
 
-from pprint import pprint as pp
-from datetime import datetime
-
 import db
+import auth
+
+def login_required(original_function):
+    @wraps(original_function)
+    def decorated_function(*args, **kwargs):
+        if auth.get_session(request):
+            return original_function(*args, **kwargs)
+        return redirect(url_for('login', next=request.url))
+    return decorated_function
+
 
 @app.before_request
 def before_request():
@@ -53,15 +63,14 @@ def uplink():
 @app.route('/')
 def index():
     return redirect(url_for('webindex'), code=302)
-   
+
 @app.route('/web/')
+@login_required
 def webindex():
-    data = {
-        'API_KEY': settings.MAPS_API_KEY,
-    }  
-    return render_template('index.html', **data)
+    return render_template('index.html')
 
 @app.route('/admin/', methods=['GET', 'POST'])
+@login_required
 def admin():
     cursor = g.dbhandle.cursor()
     if request.method == "GET":
@@ -78,6 +87,7 @@ def admin():
         return redirect(url_for('admin'))
 
 @app.route('/api/table', methods=['POST'])
+@login_required
 def datatable():
     if not request.is_json:
         abort(400, "Data not in JSON format!")
@@ -101,6 +111,7 @@ def datatable():
     return jsonify(result)
 
 @app.route('/map/', methods=['POST'])
+@login_required
 def render_map():
     if not request.is_json:
         abort(400)
