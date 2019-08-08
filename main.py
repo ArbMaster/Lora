@@ -106,10 +106,13 @@ def render_map():
         abort(400)
         return
     try:
-        latitude  = request.json['latitude']
-        longitude = request.json['longitude']
+        latitude  = float(request.json['latitude'])
+        longitude = float(request.json['longitude'])
     except KeyError:
         abort(400, description="Coordinates are missing!")
+        return
+    except ValueError:
+        abort(400, description="Coordinates must be real numbers!")
         return
     if latitude and longitude:
         start_coords = (latitude, longitude)
