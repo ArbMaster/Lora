@@ -30,21 +30,21 @@ class Payload:
 
     def _decode_watteco(self):
         return "" #TODO
-    
+
     def _decode_adeunis(self):
         #See: https://www.adeunis.com/wp-content/uploads/2017/08/FTD_sigfox_RC1_UG_FR_GB_V1.1.3.pdf
         payload = bytes.fromhex(self._raw_bytes)
         self.flags, self.data = payload[0], self._raw_bytes[2:]
-        
+
         if self.flags & (1 << 6):
             self.source = 'Accelerometer'
         elif self.flags & (1 << 5):
             self.source = 'Button'
         else:
             self.source = 'Periodic'
-        
+
         index = 0
-        
+
         if self.flags & (1 << 7):
             self.temperature = int(self.data[:index+2], 16)
             index += 2
@@ -55,31 +55,30 @@ class Payload:
             frac = lat[4:7]
             dir  = 1 if (int(lat[7]) & 0x1) == 0 else -1
             deg  = dir * (deg + float(min+'.'+frac) / 60)
-            self.latitude = '{0:.4f}'.format(deg)
-            
+            self.latitude = float('{0:.4f}'.format(deg))
+
             lng  = self.data[index+8:index+16]
             deg  = int(lng[:3])
             min  = lng[3:5]
             frac = lng[5:7]
             deg  = dir * (deg + float(min+'.'+frac) / 60)
-            self.longitude = '{0:.4f}'.format(deg)
-            
+            self.longitude = float('{0:.4f}'.format(deg))
+
             self.quality = int(self.data[index+16: index+18], 16)
             index += 18
         else:
-            self.latitude = ''
-            self.longitude = ''
+            self.latitude, self.longitude  = None, None
             self.quality = ''
         if self.flags & (1 << 3):
             self.uplink = int(self.data[index:index+2], 16)
             self.downlink = int(self.data[index+2:index+4], 16)
-    
+
     def _decode(self):
         if self._decoder == 'adeunis':
             self._decode_adeunis()
         else:
             raise TypeError("Cannot decode payload of type '%s'!" % self._decoder)
-            
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:

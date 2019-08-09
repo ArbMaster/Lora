@@ -5,9 +5,9 @@ from __future__ import print_function
 from flask import (
     Flask,
     session,
-    g, 
-    request, 
-    render_template, 
+    g,
+    request,
+    render_template,
     jsonify,
     abort,
     redirect,
@@ -44,9 +44,10 @@ def before_request():
 
 @app.teardown_request
 def teardown_request(exception):
-    g.dbhandle.close()        
+    g.dbhandle.close()
 
 @app.route('/lora/', methods=['POST'])
+
 def uplink():
     if request.is_json:
         data = request.json['DevEUI_uplink']
@@ -59,7 +60,6 @@ def uplink():
         return "", 200
     else:
         return "", 400
-
 @app.route('/')
 def index():
     return redirect(url_for('webindex'), code=302)
@@ -100,15 +100,42 @@ def datatable():
     except KeyError:
         abort(400, description="Required parameters are missing!")
         return
-    data = db.get_all_records(g.dbhandle.cursor(), offset, limit)
-    recordCount = db.get_count(g.dbhandle.cursor())
+    user_id = auth.get_session(request)
+    data = db.get_all_records(g.dbhandle.cursor(), user_id, offset, limit)
+    recordCount = db.get_count(g.dbhandle.cursor(),user_id)
     result = {
-        'draw': draw, 
-        'recordsFiltered': recordCount, 
+        'draw': draw,
+        'recordsFiltered': recordCount,
         'recordsTotal': recordCount,
         'data': data
     }
     return jsonify(result)
+
+@app.route('/fullmap/', methods=['GET'])
+@login_required
+def render_fullmap():
+    user_id = auth.get_session(request)
+    #start_coords = (settings.DEFAULT_DEVICE_LAT, settings.DEFAULT_DEVICE_LNG)
+    #folium_map = folium.Map(location=start_coords, zoom_start=14)
+    cursor = g.dbhandle.cursor()
+    markers = []
+    maxlat, maxlng, minlat, minlng = 0, 0, 10**32, 10*32
+    for device in db.get_last_loc(cursor, user_id):
+    #for device in db.deg_fake_last_loc(): #fake device for tests. Test OK
+        markers.append(folium.Marker([device['Latitude'], device['Longitude']]))
+        maxlat = max(maxlat, device['Latitude'])
+        maxlng = max(maxlng, device['Longitude'])
+        minlat = min(maxlat, device['Latitude'])
+        minlng = min(maxlng, device['Longitude'])
+
+    lat = (minlat + maxlat) / 2
+    lng = (minlng + maxlng) / 2
+
+    folium_map = folium.Map(location=(lat, lng), zoom_start=10)
+    for marker in markers:
+        marker.add_to(folium_map)
+
+    return folium_map._repr_html_()
 
 @app.route('/map/', methods=['POST'])
 @login_required
@@ -133,7 +160,7 @@ def render_map():
     else:
         abort(400, description="Invalid coordinates!")
         return
-    
-        
+
+
 if __name__ == '__main__':
     app.run()
