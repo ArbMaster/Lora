@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS Profile (
 CREATE TABLE IF NOT EXISTS Device (
     deveui TEXT PRIMARY KEY,
     pid INTEGER NOT NULL,
-    FOREIGN KEY(pid) REFERENCES Profile(pid)
+    uid INTEGER NOT NULL,
+    FOREIGN KEY(pid) REFERENCES Profile(pid),
+    FOREIGN KEY(uid) REFERENCES User(id)
 )WITHOUT ROWID;
 
 CREATE TABLE IF NOT EXISTS User (
@@ -25,13 +27,6 @@ CREATE TABLE IF NOT EXISTS User (
     email TEXT NOT NULL
 );
 
---TODO: Add indices based on performance requirement
-CREATE TABLE IF NOT EXISTS UserDevice (
-    uid INTEGER NOT NULL,
-    deveui TEXT NOT NULL,
-    FOREIGN KEY (uid) REFERENCES User(id),
-    FOREIGN KEY (deveui) REFERENCES Device(deveui)
-);
 
 CREATE TABLE IF NOT EXISTS Session (
     cookie TEXT NOT NULL PRIMARY KEY,
