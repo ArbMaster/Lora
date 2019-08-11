@@ -132,5 +132,6 @@ def login():
 @app.route('/logout/')
 def logout():
     user_id = get_session(request)
-    delete_session(user_id)
+    if user_id:
+        delete_session(user_id)
     return redirect(url_for('webindex'))
